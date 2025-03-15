@@ -2,25 +2,31 @@ package com.example.myapplication.Activities;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.CompositePageTransformer;
 import androidx.viewpager2.widget.MarginPageTransformer;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.example.myapplication.Adapters.MovieListAdapter;
 import com.example.myapplication.Adapters.SliderAdapter;
+import com.example.myapplication.Domains.Movies;
 import com.example.myapplication.Domains.SliderItems;
 import com.example.myapplication.R;
 import com.example.myapplication.databinding.ActivityMainBinding;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Logger;
 import com.google.firebase.database.ValueEventListener;
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 
@@ -35,14 +41,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void run() {
             int nextItem = binding.viewPager2.getCurrentItem() + 1;
-//            if (nextItem >= binding.viewPager2.getAdapter().getItemCount()) {
-//                nextItem = 0;
-//            }
+            if (nextItem >= binding.viewPager2.getAdapter().getItemCount()) {
+                nextItem = 0;
+            }
             binding.viewPager2.setCurrentItem(nextItem, true);
             sliderHandler.postDelayed(this, 2000);
         }
     };
-    ArrayList<SliderItems> items = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,36 +58,63 @@ public class MainActivity extends AppCompatActivity {
         chipNavigationBar.setItemSelected(R.id.explorer, true);
         chipNavigationBar.setOnItemSelectedListener(i -> {
         });
-        database = FirebaseDatabase.getInstance("https://testproject-81cb6-default-rtdb.asia-southeast1.firebasedatabase.app");
+        database = FirebaseDatabase.getInstance("https://testproject-81cb6-default-rtdb.asia-southeast1.firebasedatabase.app/");
         Window w = getWindow();
         w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        FirebaseApp.initializeApp(this);
+        Log.d("ZZZZZZZZZZ", "Firebase initialized");
         initBanner();
+        initTopMovies();
     }
 
     private void initBanner() {
-        DatabaseReference reference = database.getReference("Banners");
+        DatabaseReference myRef = database.getReference("Banners");
         binding.progressBarBanner.setVisibility(View.VISIBLE);
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+        ArrayList<SliderItems> items = new ArrayList<>();
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        SliderItems sliderItems = dataSnapshot.getValue(SliderItems.class);
-                        items.add(sliderItems);
+                    for (DataSnapshot issue : snapshot.getChildren()) {
+                        items.add(issue.getValue(SliderItems.class));
                     }
-                    banner();
+                    banner(items);
                     binding.progressBarBanner.setVisibility(View.GONE);
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
     }
 
-    private void banner() {
+    private void initTopMovies() {
+        DatabaseReference myRef = database.getReference("Items");
+        binding.progressBarTop.setVisibility(View.VISIBLE);
+        ArrayList<Movies> items = new ArrayList<>();
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot issue : snapshot.getChildren()) {
+                        items.add(issue.getValue(Movies.class));
+                    }
+                    if (!items.isEmpty()) {
+                        binding.recyclerViewTopMovies.setLayoutManager(new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false));
+                        binding.recyclerViewTopMovies.setAdapter(new MovieListAdapter(items));
+                    }
+                    binding.progressBarTop.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
+
+    private void banner(ArrayList<SliderItems> items) {
         binding.viewPager2.setAdapter(new SliderAdapter(items, binding.viewPager2));
         binding.viewPager2.setClipToPadding(false);
         binding.viewPager2.setClipChildren(false);
