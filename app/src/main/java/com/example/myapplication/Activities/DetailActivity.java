@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.transition.TransitionManager;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
@@ -13,14 +15,19 @@ import android.view.WindowManager;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.myapplication.Adapters.CastAdapter;
+import com.example.myapplication.Adapters.GenreAdapter;
 import com.example.myapplication.Domains.Movies;
 import com.example.myapplication.R;
 import com.example.myapplication.databinding.ActivityDetailBinding;
@@ -50,6 +57,10 @@ public class DetailActivity extends AppCompatActivity {
         binding.imdbTxt.setText("IMDB: " + movie.getImdb());
         binding.movieTimes.setText(movie.getYear() + " - " + movie.getTime());
         binding.movieSummery.setText(movie.getDescription());
+        binding.CastView.setLayoutManager(new LinearLayoutManager(DetailActivity.this, LinearLayoutManager.VERTICAL, false));
+        binding.CastView.setAdapter(new CastAdapter(movie.getCasts()));
+        binding.genreView.setLayoutManager(new LinearLayoutManager(DetailActivity.this, LinearLayoutManager.HORIZONTAL, false));
+        binding.genreView.setAdapter(new GenreAdapter(movie.getGenre()));
         binding.watchTrailerBtn.setOnClickListener(v -> {
             String id = movie.getTrailer().replace("http://www.youtube.com/watch?v=", "");
             Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + id));

@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("ZZZZZZZZZZ", "Firebase initialized");
         initBanner();
         initTopMovies();
+        initUpcomingMovies();
     }
 
     private void initBanner() {
@@ -96,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Log.d("ZZZZZZZZZ", "onDataChange: dachay");
                 if (snapshot.exists()) {
                     for (DataSnapshot issue : snapshot.getChildren()) {
                         items.add(issue.getValue(Movies.class));
@@ -105,6 +107,33 @@ public class MainActivity extends AppCompatActivity {
                         binding.recyclerViewTopMovies.setAdapter(new MovieListAdapter(items));
                     }
                     binding.progressBarTop.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
+
+    private void initUpcomingMovies() {
+        DatabaseReference asd = database.getReference("Upcomming");
+        binding.progressBarUpcoming.setVisibility(View.VISIBLE);
+        ArrayList<Movies> items = new ArrayList<>();
+        asd.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Log.d("ZZZZZZZZZ", "onDataChange: dachay");
+                if (snapshot.exists()) {
+                    for (DataSnapshot issue : snapshot.getChildren()) {
+                        items.add(issue.getValue(Movies.class));
+                        Log.d("ZZZZZZZZZZZZZZ", "onDataChange: " + issue.getValue());
+                    }
+                    if (!items.isEmpty()) {
+                        binding.recyclerViewUpcomingMovies.setLayoutManager(new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false));
+                        binding.recyclerViewUpcomingMovies.setAdapter(new MovieListAdapter(items));
+                    }
+                    binding.progressBarUpcoming.setVisibility(View.GONE);
                 }
             }
 
