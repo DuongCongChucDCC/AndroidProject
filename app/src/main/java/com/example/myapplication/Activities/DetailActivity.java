@@ -113,6 +113,12 @@ public class DetailActivity extends AppCompatActivity {
                 isFavorited = true;
             }
         });
+        binding.share.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("text/plain");
+            intent.putExtra(Intent.EXTRA_TEXT, movie.toString());
+            startActivity(Intent.createChooser(intent, "Chia sẻ qua:"));
+        });
 
         float radius = 10f;
         View decorView = getWindow().getDecorView();

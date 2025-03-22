@@ -108,9 +108,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("ZZZZZZZZZZZZZZ", "onActivityResult: " + requestCode);
-        Log.d("ZZZZZZZZZZZZZZ", "onActivityResult: " + resultCode);
-        Log.d("ZZZZZZZZZZZZZZ", "onActivityResult: " + data);
         if (requestCode == 100 && resultCode == RESULT_OK) {
             Log.d("ZZZZZZZZZZZZZZ", "onActivityResult: " + data);
             ArrayList<String> text = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
