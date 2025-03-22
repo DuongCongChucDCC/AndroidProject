@@ -30,6 +30,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 
@@ -55,7 +56,6 @@ public class ExplorerFrag extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentExplorerBinding.inflate(inflater, container, false);
         return binding.getRoot();
-
     }
 
     @Override
@@ -69,6 +69,16 @@ public class ExplorerFrag extends Fragment {
         initBanner();
         initTopMovies();
         initUpcomingMovies();
+
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        String token = task.getResult();
+                        Log.d("zzzzzzzzzzzzzzzzzzzzz", "Token: " + token);
+                    } else {
+                        Log.e("zzzzzzzzzzzzzzzzzzzzz", "Không thể lấy token", task.getException());
+                    }
+                });
     }
 
     private void initBanner() {
