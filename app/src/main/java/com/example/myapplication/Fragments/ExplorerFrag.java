@@ -69,16 +69,6 @@ public class ExplorerFrag extends Fragment {
         initBanner();
         initTopMovies();
         initUpcomingMovies();
-
-        FirebaseMessaging.getInstance().getToken()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        String token = task.getResult();
-                        Log.d("zzzzzzzzzzzzzzzzzzzzz", "Token: " + token);
-                    } else {
-                        Log.e("zzzzzzzzzzzzzzzzzzzzz", "Không thể lấy token", task.getException());
-                    }
-                });
     }
 
     private void initBanner() {
